@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 
 #include <iostream>
 #include <string>
@@ -26,12 +26,10 @@ public:
 };
 
 enum TipColet{ ColetMic, ColetMediu, ColetMare, ColetFoarteMare };
-enum TipStatus{ Înregistrată, În_tranzit, Livrată, Întârziată, Anulată};
 
 class Comanda {
 public:
     TipColet colet;
-    TipStatus status = Înregistrată;
     string AWB;
     string adresa;
     string detaliiComanda;
@@ -42,9 +40,6 @@ public:
         this->adresa = adresa;
         this->detaliiComanda = detaliiComanda;
         this->data = dataComanda;
-    }
-    void setStatus(TipStatus s) {
-        status = s;
     }
     TipColet getTipColet() {
         return colet;
@@ -60,34 +55,55 @@ private:
 public:
     Comanda* comanda;
     Curier(string nume, string email, string tel, string adresa, FirmaCurierat firma) : Cont(nume, email, tel), firma(firma) {}
-    void setStatusComanda(Comanda& c) {
-        int nr = rand() % 3;
-        switch (nr) {
-        case 0:
-            c.setStatus(În_tranzit);
-            break;
-        case 1:
-            c.setStatus(Livrată);
-            break;
-        case 2:
-            c.setStatus(Întârziată);
-            break;
-        case 3:
-            c.setStatus(Anulată);
-            break;
-        default:
-            break;
-        }
+    void actualizareStatusComanda() {
+
     }
     string getCurier() {
          return nume;
     }
-    void afisareStatusComanda(Comanda& c) {
-        cout << "Comanda " << c.AWB << "are statusul: " << (TipStatus)c.status << endl;
+};
+
+class SistemPlata {
+private:
+    int sumaCard;
+public:
+    SistemPlata(int sumaCard) {
+        this->sumaCard = sumaCard;
+    }
+    int getSumaCard() const {
+        return sumaCard;
+    }
+    void setSumaCard(int suma) {
+        sumaCard = suma;
+    }
+    int calculSuma(Comanda& comanda) {
+        int pret = 0;
+        switch (comanda.getTipColet()) {
+        case ColetMic:
+            pret = 10;
+            break;
+        case ColetMediu:
+            pret = 15;
+            break;
+        case ColetMare:
+            pret = 20;
+            break;
+        case ColetFoarteMare:
+            pret = 25;
+            break;
+        default:
+            pret = 10;
+        }
+        return pret;
+    }
+    void afisareMesajEfecutarePlata(int suma) {
+        if (sumaCard > suma)
+            cout<< "Plata s-a efectuat cu succes";
+        cout<< "Fonduri insuficiente";
     }
 };
 
-
+// Class representing a Customer
 class Client : Cont{
 private:
     string adresaExpeditor;
@@ -114,41 +130,7 @@ public:
         else return "Nu a fost asociat un curier";
     }
     void afisareClient() {
-        cout << "Clientul " << nume << " a efectuat comanda " << getComanda() << " la data " << comanda->data << " si i s-a asociat curierul " << getCurier() << endl;
-    }
-};
-
-class SistemPlata {
-private:
-    int sumaCard;
-public:
-    SistemPlata(int sumaCard) {
-        this->sumaCard = sumaCard;
-    }
-    int calculSuma(Comanda& comanda) {
-        int pret = 0;
-        switch (comanda.getTipColet()) {
-        case ColetMic:
-            pret = 10;
-            break;
-        case ColetMediu:
-            pret = 15;
-            break;
-        case ColetMare:
-            pret = 20;
-            break;
-        case ColetFoarteMare:
-            pret = 25;
-            break;
-        default:
-            pret = 10;
-        }
-        return pret;
-    }
-    void afisareMesajEfecutarePlata(Client& client, int suma) {
-        if (sumaCard > suma)
-            cout << "Plata s-a efectuat cu succes pentru comanda " << client.getComanda() << endl;
-        else cout << "Fonduri insuficiente pentru comanda " << client.getComanda() << endl;
+        cout << "Clientul " << nume << "a efectuat comanda " << getComanda() << "la data " << comanda->data << "si i s-a asociat curierul " << getCurier() << endl;
     }
 };
 
@@ -159,7 +141,6 @@ string makeAWB() {
         for (int j = 1; j <= 4; j++) {
             awb+= to_string(rand() % n);
         }
-        awb += " ";
     }
     return awb;
 }
@@ -207,14 +188,6 @@ int main() {
     client5.setComanda(&comanda3);
     client6.setComanda(&comanda1);
 
-    //Actualizare status comanda de catre curieri
-    curier2.setStatusComanda(comanda2);
-    curier2.setStatusComanda(comanda4);
-    curier3.setStatusComanda(comanda6);
-    curier4.setStatusComanda(comanda3);
-    curier5.setStatusComanda(comanda1);
-    curier6.setStatusComanda(comanda7);
-
     // Instantiere suma clienti
     SistemPlata plata1(100);
     SistemPlata plata2(140);
@@ -223,35 +196,13 @@ int main() {
     SistemPlata plata5(350);
     SistemPlata plata6(340);
 
-
-    // Afisare Client si asocierea cu comanda si curierul
-    client1.afisareClient();
-    client2.afisareClient();
-    client3.afisareClient();
-    client4.afisareClient();
-    client5.afisareClient();
-    client6.afisareClient();
-
-    cout << endl;
-
-    // Adisare status comanda
-    curier2.afisareStatusComanda(comanda2);
-    curier2.afisareStatusComanda(comanda4);
-    curier3.afisareStatusComanda(comanda6);
-    curier4.afisareStatusComanda(comanda3);
-    curier5.afisareStatusComanda(comanda1);
-    curier6.afisareStatusComanda(comanda7);
-
-    cout << endl;
-    // Calcul suma pentru tipul de comanda si afisare mesaj despre detalii plata
-    plata1.afisareMesajEfecutarePlata(client1, plata1.calculSuma(comanda1));
-    plata2.afisareMesajEfecutarePlata(client2, plata2.calculSuma(comanda2));
-    plata3.afisareMesajEfecutarePlata(client3, plata3.calculSuma(comanda3));
-    plata4.afisareMesajEfecutarePlata(client4, plata4.calculSuma(comanda4));
-    plata5.afisareMesajEfecutarePlata(client5, plata5.calculSuma(comanda5));
-    plata6.afisareMesajEfecutarePlata(client6, plata6.calculSuma(comanda6));
-
-    cout << endl;
+    // Calcul suma pentru tipul de comanda
+    plata1.afisareMesajEfecutarePlata(plata1.calculSuma(comanda1));
+    plata2.afisareMesajEfecutarePlata(plata2.calculSuma(comanda2));
+    plata3.afisareMesajEfecutarePlata(plata3.calculSuma(comanda3));
+    plata4.afisareMesajEfecutarePlata(plata4.calculSuma(comanda4));
+    plata5.afisareMesajEfecutarePlata(plata5.calculSuma(comanda5));
+    plata6.afisareMesajEfecutarePlata(plata6.calculSuma(comanda6));
 
     return 0;
 }
