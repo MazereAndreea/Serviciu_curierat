@@ -10,11 +10,12 @@
   <Class Name="Client">
     <Position X="6" Y="3" Width="1.5" />
     <TypeIdentifier>
+      <HashCode>AAEABAAAAAAAAAAAAAAAAEAAACAAAQAEAAAAAAAAEAQ=</HashCode>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Courier">
-    <Position X="2" Y="3.5" Width="1.5" />
+    <Position X="2.25" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
@@ -22,7 +23,7 @@
   <Class Name="Comanda">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAAQAAAAAgAAAAAAAAAAEBAAIAAAQAAAIAAA=</HashCode>
+      <HashCode>AAQAAEAAAAQAAAAAgAAAAAAAAAAEBEAIAAAQAAAIAAA=</HashCode>
       <FileName>main.cpp</FileName>
     </TypeIdentifier>
   </Class>

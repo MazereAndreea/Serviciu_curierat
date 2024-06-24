@@ -23,15 +23,15 @@ public:
         this->nume = nume;
         this->tel = tel;
     }
+    Cont(){}
 };
 
 enum TipColet{ ColetMic, ColetMediu, ColetMare, ColetFoarteMare };
-enum TipStatus{ Înregistrată, În_tranzit, Livrată, Întârziată, Anulată};
 
 class Comanda {
 public:
     TipColet colet;
-    TipStatus status = Înregistrată;
+    string status = "Inregistrata";
     string AWB;
     string adresa;
     string detaliiComanda;
@@ -43,58 +43,71 @@ public:
         this->detaliiComanda = detaliiComanda;
         this->data = dataComanda;
     }
-    void setStatus(TipStatus s) {
-        status = s;
+    void setStatus(string s) {status = s;}
+    TipColet getTipColet() { return colet;}
+    void afisareComanda() {
+        cout << "S-a efectuat o comanda de un " << tipColetToString(colet) << " pentru adresa " <<
+           " " << adresa << " la data de " << data << " cu awb-ul " << AWB << "cu detaliile: " << detaliiComanda << endl;
     }
-    TipColet getTipColet() {
-        return colet;
-    }
+    private:
+        string tipColetToString(TipColet tip) {
+            switch (tip) {
+            case ColetMic: return "ColetMic";
+            case ColetMediu: return "ColetMediu";
+            case ColetMare: return "ColetMare";
+            case ColetFoarteMare: return "ColetFoarteMare";
+            default: return "Unknown";
+            }
+        }
 };
-
 
 enum FirmaCurierat { FanCourier, DPD, Posta_Romana, SameDay };
 
 class Curier : Cont{
 private:
     FirmaCurierat firma;
+    string adresaDestinatar;
 public:
+    int salariu;
     Comanda* comanda;
-    Curier(string nume, string email, string tel, string adresa, FirmaCurierat firma) : Cont(nume, email, tel), firma(firma) {}
+    //initializare a membrilor clasei
+    Curier(string nume, string email, string tel, string adresa, FirmaCurierat firma) :
+        Cont(nume, email, tel), firma(firma), adresaDestinatar(adresaDestinatar) {}
+    Curier() { //constructor care primeste parametrii de la tastatura
+        cin >> this->nume;
+        cin >> this->email;
+        cin >> this->tel;
+        cin >> this->adresaDestinatar;
+    }
     void setStatusComanda(Comanda& c) {
-        int nr = rand() % 3;
-        switch (nr) {
-        case 0:
-            c.setStatus(În_tranzit);
-            break;
-        case 1:
-            c.setStatus(Livrată);
-            break;
-        case 2:
-            c.setStatus(Întârziată);
-            break;
-        case 3:
-            c.setStatus(Anulată);
-            break;
-        default:
-            break;
-        }
+        int nr = rand() % 3; //functie random
+        string statusuri[] = { "In tranzit", "Livrat", "Intarziat", "Anulat" }; //string cu tipuri de status
+        c.setStatus(statusuri[nr]); //setare efectiva a statusului comenzii
+    }
+    void setSalariu(int s) {
+        salariu = s;
     }
     string getCurier() {
          return nume;
     }
     void afisareStatusComanda(Comanda& c) {
-        cout << "Comanda " << c.AWB << "are statusul: " << (TipStatus)c.status << endl;
+        cout << "Comanda " << c.AWB << "are statusul: " << c.status << endl; //afisare status comanda
     }
 };
 
-
-class Client : Cont{
+class Client : Cont {
 private:
     string adresaExpeditor;
 public:
     Comanda* comanda;
     Curier* curier;
     Client(string nume, string email, string tel, string adresa) : Cont(nume, email, tel), adresaExpeditor(adresa) {}
+    Client() {
+        cin >> this->nume;
+        cin >> this->email;
+        cin >> this->tel;
+        cin >> this->adresaExpeditor;
+    }
     void setComanda(Comanda* c) {
         comanda = c;
     }
@@ -107,6 +120,11 @@ public:
     void setCurier(Curier* c) {
         curier = c;
     }
+    string setReclamatie() {
+        string reclamatie;
+        cin >> reclamatie;
+        return reclamatie;
+    }
     string getCurier() {
         if (curier) {
             return curier->getCurier();
@@ -117,6 +135,40 @@ public:
         cout << "Clientul " << nume << " a efectuat comanda " << getComanda() << " la data " << comanda->data << " si i s-a asociat curierul " << getCurier() << endl;
     }
 };
+
+class Manager : Cont {
+private:
+    string reclamatii;
+public:
+    Curier* curier;
+    Client* client;
+    Manager(string nume, string email, string tel, string reclamatii) : Cont(nume, email, tel), reclamatii(reclamatii) {}
+    Manager() {
+        cin >> this->nume;
+        cin >> this->email;
+        cin >> this->tel;
+        cin >> this->reclamatii;
+    }
+    void setSalariu(Curier& c) {
+        int salariu = 5000 + rand() % 3001; //salariu cuprins intre 5000 si 8000
+        c.setSalariu(salariu);
+    }
+    string getCurier() {
+        if (curier) {
+            return curier->getCurier();
+        }
+        else return "Nu s-a asociat un curier pentru acest manager";
+    }
+    string getReclamatie() {
+        if (client)
+            return client->setReclamatie();
+        else return "Clientul nu a facut reclamatie";
+    }
+    void afisareSalariu(Curier& curier) {
+        cout << "Curierul " << curier.getCurier() << " are salariul " << curier.salariu << endl;
+    }
+};
+
 
 class SistemPlata {
 private:
@@ -253,5 +305,73 @@ int main() {
 
     cout << endl;
 
+    //Adaugare client nou:
+    cout << "Alege 1 pentru adaugare client, 2 pentru adaugare curier, 3 pentru afisare comanda, 4 pentru reclamatie" << endl;
+    int nr;
+    cin >> nr;
+    if (nr == 1) {
+        cout << "Introduce un client nou: (nume, email, tel, adresaExpeditor) "<<endl;
+        Client* client7 = new Client();
+    }
+    if(nr == 2){
+        cout << "Introduce un curier: (nume, email, tel, adresaDestinatar)";
+        Curier* curier7 = new Curier();
+    }
+    if (nr == 3) {
+        cout << "Introduce numarul comenzii pe care vrei sa-l vizualizezi: " << endl;
+        int nr_comanda;
+        cin >> nr_comanda;
+        switch (nr_comanda) {
+        case 1:
+            comanda1.afisareComanda();
+            break;
+        case 2:
+            comanda2.afisareComanda();
+            break;
+        case 3:
+            comanda3.afisareComanda();
+            break;
+        case 4:
+            comanda4.afisareComanda();
+            break;
+        case 5:
+            comanda5.afisareComanda();
+            break;
+        case 6:
+            comanda6.afisareComanda();
+            break;
+        case 7:
+            comanda7.afisareComanda();
+            break;
+        default: break;
+        }
+    }  
+    if (nr == 4) {
+        cout << "Ce client are reclamatie?" << endl;
+        int ce_client;
+        cin >> ce_client;
+        switch (ce_client) {
+        case 1:
+            client1.setReclamatie();
+            break;
+        case 2:
+            client2.setReclamatie();
+            break;
+        case 3:
+            client3.setReclamatie();
+            break;
+        case 4:
+            client4.setReclamatie();
+            break;
+        case 5:
+            client5.setReclamatie();
+            break;
+        case 6:
+            client6.setReclamatie();
+            break;
+        default:
+            break;
+        }
+    }
     return 0;
 }
